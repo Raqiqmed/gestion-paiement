@@ -3,15 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gestion Paramètres</title>
+  <title>Gestion Paiements</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Paramètres des Étudiants</h1>
-  <table id="table-parametres">
+  <h1>Gestion des Paiements</h1>
+  <label for="niveau-select">Choisir un niveau :</label>
+  <select id="niveau-select" onchange="chargerEtudiants()">
+    <option value="">-- Sélectionner --</option>
+    <option value="1">Niveau 1</option>
+    <option value="2">Niveau 2</option>
+    <option value="3">Niveau 3</option>
+  </select>
+  <table id="table-paiements">
     <thead>
       <tr>
-        <th>Niveau</th>
         <th>Étudiant</th>
         <th>Janvier</th>
         <th>Février</th>
@@ -19,9 +25,7 @@
         <!-- Ajouter les autres mois -->
       </tr>
     </thead>
-    <tbody>
-      <!-- Les données statiques ou dynamiques -->
-    </tbody>
+    <tbody></tbody>
   </table>
   <script src="script.js"></script>
 </body>
