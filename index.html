@@ -3,34 +3,75 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Paramètres des Étudiants</title>
+  <title>Gestion des Paiements</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Paramètres des Étudiants</h1>
-  <table id="table-parametres">
-    <thead>
-      <tr>
-        <th>Niveau</th>
-        <th>Étudiant</th>
-        <th>Janvier</th>
-        <th>Février</th>
-        <th>Mars</th>
-        <th>Avril</th>
-        <th>Mai</th>
-        <th>Juin</th>
-        <th>Juillet</th>
-        <th>Août</th>
-        <th>Septembre</th>
-        <th>Octobre</th>
-        <th>Novembre</th>
-        <th>Décembre</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- Les données dynamiques seront insérées ici -->
-    </tbody>
-  </table>
+  <header>
+    <nav>
+      <button id="btn-paiements" onclick="afficherOnglet('paiements')">Paiements</button>
+      <button id="btn-parametres" onclick="afficherOnglet('parametres')">Paramètres</button>
+    </nav>
+  </header>
+  <main>
+    <!-- Section Paiements -->
+    <section id="paiements" class="onglet">
+      <h1>Gestion des Paiements</h1>
+      <label for="niveau-select">Choisir un niveau :</label>
+      <select id="niveau-select" onchange="chargerPaiements()">
+        <option value="">-- Sélectionner --</option>
+        <option value="Niveau 1">Niveau 1</option>
+        <option value="Niveau 2">Niveau 2</option>
+        <option value="Niveau 3">Niveau 3</option>
+      </select>
+      <table id="table-paiements">
+        <thead>
+          <tr>
+            <th>Étudiant</th>
+            <th>Janvier</th>
+            <th>Février</th>
+            <th>Mars</th>
+            <th>Avril</th>
+            <th>Mai</th>
+            <th>Juin</th>
+            <th>Juillet</th>
+            <th>Août</th>
+            <th>Septembre</th>
+            <th>Octobre</th>
+            <th>Novembre</th>
+            <th>Décembre</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <!-- Section Paramètres -->
+    <section id="parametres" class="onglet hidden">
+      <h1>Paramètres des Étudiants</h1>
+      <table id="table-parametres">
+        <thead>
+          <tr>
+            <th>Niveau</th>
+            <th>Étudiant</th>
+            <th>Janvier</th>
+            <th>Février</th>
+            <th>Mars</th>
+            <th>Avril</th>
+            <th>Mai</th>
+            <th>Juin</th>
+            <th>Juillet</th>
+            <th>Août</th>
+            <th>Septembre</th>
+            <th>Octobre</th>
+            <th>Novembre</th>
+            <th>Décembre</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+  </main>
   <script src="script.js"></script>
 </body>
 </html>
