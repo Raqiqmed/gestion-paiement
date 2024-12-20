@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
 import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
 
-// Configuration Firebase
+// Configurationn Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyBS4GsA2GuI8M_P_HznJnzCEa2ypubDxDc",
   authDomain: "gestion-des-paiements-5f92f.firebaseapp.com",

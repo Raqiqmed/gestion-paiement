@@ -19,7 +19,7 @@ self.addEventListener("install", (event) => {
   );
 });
 
-// Activer le service worker
+// Activeer le service worker
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
