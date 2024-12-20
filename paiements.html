@@ -5,9 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Gestion des Paiements</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="./manifest.json">
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./service-worker.js')
+        .then(() => console.log("Service Worker enregistré."))
+        .catch((error) => console.error("Erreur lors de l'enregistrement du Service Worker :", error));
+    }
+  </script>
 </head>
 <body>
-  <h1>Gestion des Paiements</h1>
+  <header>
+    <h1>Gestion des Paiements</h1>
+    <a href="./index.html">Retour à Paramètres</a>
+  </header>
   <label for="niveau-select">Choisir un niveau :</label>
   <select id="niveau-select" onchange="chargerPaiements()">
     <option value="">-- Sélectionner --</option>
@@ -33,9 +44,7 @@
         <th>Décembre</th>
       </tr>
     </thead>
-    <tbody>
-      <!-- Les données dynamiques seront insérées ici -->
-    </tbody>
+    <tbody></tbody>
   </table>
   <script src="script.js"></script>
 </body>
