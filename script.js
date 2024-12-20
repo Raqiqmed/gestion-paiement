@@ -1,90 +1,84 @@
-// Charger ou initialiser les données
-let parametres = JSON.parse(localStorage.getItem("paiements")) || [
-  { niveau: "Niveau 1", etudiant: "Étudiant A", paiements: [true, false, true, false, false, false, false, false, false, false, false, false] },
-  { niveau: "Niveau 1", etudiant: "Étudiant B", paiements: [false, true, false, false, false, false, false, false, false, false, false, false] },
-  { niveau: "Niveau 2", etudiant: "Étudiant C", paiements: [true, true, true, false, false, false, false, false, false, false, false, false] },
-];
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
 
-// Sauvegarder les données dans localStorage
-function sauvegarderDonnees() {
-  localStorage.setItem("paiements", JSON.stringify(parametres));
-}
+// Configuration Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyBS4GsA2GuI8M_P_HznJnzCEa2ypubDxDc",
+  authDomain: "gestion-des-paiements-5f92f.firebaseapp.com",
+  databaseURL: "https://gestion-des-paiements-5f92f-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "gestion-des-paiements-5f92f",
+  storageBucket: "gestion-des-paiements-5f92f.appspot.com",
+  messagingSenderId: "401494582273",
+  appId: "1:401494582273:web:35677f6c168c55576acc00"
+};
 
-// Charger les paramètres dynamiques
-function chargerParametres() {
-  const tbody = document.querySelector("#table-parametres tbody");
-  tbody.innerHTML = ""; // Réinitialiser le tableau
-  parametres.forEach((row, index) => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${row.niveau}</td>
-      <td>${row.etudiant}</td>
-      ${row.paiements
-        .map(
-          (paid, moisIndex) =>
-            `<td><input type="checkbox" data-param-index="${index}" data-mois="${moisIndex}" ${paid ? "checked" : ""}></td>`
-        )
-        .join("")}
-    `;
-    tbody.appendChild(tr);
-  });
+// Initialisation Firebase
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
 
-  document.querySelectorAll("#table-parametres input[type='checkbox']").forEach((checkbox) => {
-    checkbox.addEventListener("change", miseAJourParametre);
+// Charger les niveaux dans le menu déroulant
+async function chargerNiveaux() {
+  const snapshot = await get(ref(db, "paiements"));
+  const parametres = snapshot.exists() ? snapshot.val() : [];
+
+  const niveaux = [...new Set(parametres.map(row => row.niveau))];
+  const select = document.getElementById("niveau-select");
+
+  niveaux.forEach(niveau => {
+    const option = document.createElement("option");
+    option.value = niveau;
+    option.textContent = niveau;
+    select.appendChild(option);
   });
 }
 
-// Charger les paiements dynamiques
-function chargerPaiements() {
+// Charger les paiements pour un niveau sélectionné
+async function chargerPaiements() {
   const niveau = document.getElementById("niveau-select").value;
   const tbody = document.querySelector("#table-paiements tbody");
-  tbody.innerHTML = ""; // Réinitialiser le tableau
-  const etudiantsNiveau = parametres.filter((row) => row.niveau === niveau);
+  tbody.innerHTML = ""; // Effacer les lignes existantes
+
+  if (!niveau) return; // Aucun niveau sélectionné
+
+  const snapshot = await get(ref(db, "paiements"));
+  const parametres = snapshot.exists() ? snapshot.val() : [];
+  const etudiantsNiveau = parametres.filter(row => row.niveau === niveau);
+
   etudiantsNiveau.forEach((row, index) => {
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${row.etudiant}</td>
-      ${row.paiements
-        .map(
-          (paid, moisIndex) =>
-            `<td><input type="checkbox" data-niveau="${niveau}" data-etudiant="${index}" data-mois="${moisIndex}" ${paid ? "checked" : ""}></td>`
-        )
-        .join("")}
+      ${row.paiements.map((paid, moisIndex) =>
+        `<td><input type="checkbox" data-niveau="${niveau}" data-etudiant="${index}" data-mois="${moisIndex}" ${paid ? "checked" : ""}></td>`
+      ).join("")}
     `;
     tbody.appendChild(tr);
   });
 
+  // Ajouter des événements pour synchroniser les cases à cocher
   document.querySelectorAll("#table-paiements input[type='checkbox']").forEach((checkbox) => {
     checkbox.addEventListener("change", miseAJourPaiement);
   });
 }
 
-// Mise à jour depuis Paiements
-function miseAJourPaiement(e) {
+// Mettre à jour Firebase lorsque les cases à cocher changent
+async function miseAJourPaiement(e) {
   const checkbox = e.target;
   const niveau = checkbox.dataset.niveau;
   const etudiantIndex = parseInt(checkbox.dataset.etudiant, 10);
   const moisIndex = parseInt(checkbox.dataset.mois, 10);
 
-  parametres.find((row) => row.niveau === niveau && parametres.indexOf(row) === etudiantIndex).paiements[moisIndex] = checkbox.checked;
-  sauvegarderDonnees();
-  chargerParametres();
+  const snapshot = await get(ref(db, "paiements"));
+  const parametres = snapshot.exists() ? snapshot.val() : [];
+  const etudiant = parametres.filter(row => row.niveau === niveau)[etudiantIndex];
+
+  if (etudiant) {
+    etudiant.paiements[moisIndex] = checkbox.checked;
+
+    // Sauvegarder les modifications dans Firebase
+    await set(ref(db, "paiements"), parametres);
+  }
 }
 
-// Mise à jour depuis Paramètres
-function miseAJourParametre(e) {
-  const checkbox = e.target;
-  const paramIndex = parseInt(checkbox.dataset.paramIndex, 10);
-  const moisIndex = parseInt(checkbox.dataset.mois, 10);
-
-  parametres[paramIndex].paiements[moisIndex] = checkbox.checked;
-  sauvegarderDonnees();
-  chargerPaiements();
-}
-
-// Charger les paramètres ou paiements au démarrage
-if (document.querySelector("#table-parametres")) {
-  window.onload = chargerParametres;
-} else if (document.querySelector("#niveau-select")) {
-  window.onload = chargerPaiements;
-}
+// Charger les niveaux au démarrage
+window.onload = chargerNiveaux;

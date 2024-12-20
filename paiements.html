@@ -5,14 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Gestion des Paiements</title>
   <link rel="stylesheet" href="style.css">
-  <link rel="manifest" href="./manifest.json">
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./service-worker.js')
-        .then(() => console.log("Service Worker enregistré."))
-        .catch((error) => console.error("Erreur lors de l'enregistrement du Service Worker :", error));
-    }
-  </script>
 </head>
 <body>
   <header>
@@ -22,9 +14,7 @@
   <label for="niveau-select">Choisir un niveau :</label>
   <select id="niveau-select" onchange="chargerPaiements()">
     <option value="">-- Sélectionner --</option>
-    <option value="Niveau 1">Niveau 1</option>
-    <option value="Niveau 2">Niveau 2</option>
-    <option value="Niveau 3">Niveau 3</option>
+    <!-- Les options seront chargées dynamiquement -->
   </select>
   <table id="table-paiements">
     <thead>
@@ -46,6 +36,62 @@
     </thead>
     <tbody></tbody>
   </table>
-  <script src="script.js"></script>
+
+  <!-- Firebase SDKs -->
+    <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+    import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBS4GsA2GuI8M_P_HznJnzCEa2ypubDxDc",
+      authDomain: "gestion-des-paiements-5f92f.firebaseapp.com",
+      databaseURL: "https://gestion-des-paiements-5f92f-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "gestion-des-paiements-5f92f",
+      storageBucket: "gestion-des-paiements-5f92f.appspot.com",
+      messagingSenderId: "401494582273",
+      appId: "1:401494582273:web:35677f6c168c55576acc00"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    async function chargerDonneesParametres() {
+      const snapshot = await get(ref(db, "paiements"));
+      const parametres = snapshot.exists() ? snapshot.val() : [];
+      const tbody = document.querySelector("#table-parametres tbody");
+      tbody.innerHTML = ""; // Clear table
+      parametres.forEach((row, index) => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${row.niveau}</td>
+          <td>${row.etudiant}</td>
+          ${row.paiements.map((paid, moisIndex) => 
+            `<td><input type="checkbox" data-param-index="${index}" data-mois="${moisIndex}" ${paid ? "checked" : ""}></td>`
+          ).join("")}
+        `;
+        tbody.appendChild(tr);
+      });
+
+      // Add event listeners to checkboxes
+      document.querySelectorAll("#table-parametres input[type='checkbox']").forEach((checkbox) => {
+        checkbox.addEventListener("change", miseAJourParametre);
+      });
+    }
+
+    async function miseAJourParametre(e) {
+      const checkbox = e.target;
+      const paramIndex = parseInt(checkbox.dataset.paramIndex);
+      const moisIndex = parseInt(checkbox.dataset.mois);
+
+      const snapshot = await get(ref(db, "paiements"));
+      const parametres = snapshot.exists() ? snapshot.val() : [];
+      parametres[paramIndex].paiements[moisIndex] = checkbox.checked;
+
+      // Save changes
+      await set(ref(db, "paiements"), parametres);
+    }
+
+    window.onload = chargerDonneesParametres;
+  </script>
 </body>
 </html>
